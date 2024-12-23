@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #333;
+        }
+        p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        button {
+            font-size: 1.2rem;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        button:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0px 0px 1px 1px #333;
+        }
+        .button-container {
+            display: flex;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Камень-ножницы-бумага</h1>
+    <p>Компьютер: <span id="computer-score">0</span></p>
+    <p>Вы: <span id="player-score">0</span></p>
+
+    <button id="rock">Камень</button>
+    <button id="paper">Бумага</button>
+    <button id="scissors">Ножницы</button>
+   
+   <script> 
+   /*ответ компьютер генерируется случайным образом с равным шансом
+   НО Раз в 4 ходе кода должен смотреть, какой элемент выбирает пользователь меньше всего и следующим ходом делает выбор,
+    который побеждает этот элемент. НО Если пользователь более 5 раз выбирает один и тот же ответ, 
+    компьютер делает выбор следующим ходом, который побеждает этот элемент.*/
+     const computerScore = document.getElementById('computer-score');
+     const playerScore = document.getElementById('player-score');
+     const buttons = document.querySelectorAll('button');
+
+     let computerPoints = 0;
+        let playerPoints = 0;
+        let userChoiceCount = { rock: 0, paper: 0, scissors: 0 };
+        let counter = 0;
+
+        const getComputerChoice = () => {
+            const choices = ['rock', 'paper', 'scissors'];
+            if (counter === 4 && Object.values(userChoiceCount).some(value => value > 5)) {
+                const leastUsedChoice = Object.keys(userChoiceCount).reduce((a, b) => userChoiceCount[a] < userChoiceCount[b] ? a : b);
+                return leastUsedChoice === 'rock' ? 'paper' : leastUsedChoice === 'paper' ? 'scissors' : 'rock';
+            }
+            if (counter === 4) {
+                counter = 0;
+            }
+            counter++;
+            return choices[Math.floor(Math.random() * choices.length)];
+        };
+
+        const updateChoiceCount = (choice) => {
+            userChoiceCount[choice]++;
+        };
+
+        const determineWinner = (computerChoice, playerChoice) => {
+            if (computerChoice === playerChoice) {
+                return 'tie';
+            }
+
+            if ((computerChoice === 'rock' && playerChoice === 'scissors') ||
+                (computerChoice === 'scissors' && playerChoice === 'paper') ||
+                (computerChoice === 'paper' && playerChoice === 'rock')) {
+                return 'computer';
+            }
+
+            return 'player';
+        };
+
+        const updateScores = (winner) => {
+            if (winner === 'computer') {
+                computerPoints++;
+                computerScore.textContent = computerPoints;
+            } else if (winner === 'player') {
+                playerPoints++;
+                playerScore.textContent = playerPoints;
+            }
+        };
+
+        const playRound = (computerChoice, playerChoice) => {
+            const winner = determineWinner(computerChoice, playerChoice);
+            updateScores(winner);
+            updateChoiceCount(playerChoice);
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const computerChoice = getComputerChoice();
+                const playerChoice = button.id.replace('-button', '');
+                playRound(computerChoice, playerChoice);
+            });
+        });
+
+        goButton.addEventListener('click', () => {
+            buttons.forEach((button) => button.disabled = false);
+            userChoiceCount = { rock: 0, paper: 0, scissors: 0 };
+            counter = 0;
+        });
+    </script>
+</body>
+</html>
